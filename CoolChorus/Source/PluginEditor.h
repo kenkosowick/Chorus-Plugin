@@ -24,7 +24,8 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void InitializeSliders(); 
+    void InitializeSliders();
+    void InitializeLabels(); 
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -34,6 +35,10 @@ private:
     juce::Slider mDryWetSlider;
     juce::Slider mFeedbackSlider;
     juce::Slider mDelayTimeSlider;
+    
+    juce::Label mDryWetLabel;
+    juce::Label mFeedbackLabel;
+    juce::Label mDelayTimeLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoolChorusAudioProcessorEditor)
 };
