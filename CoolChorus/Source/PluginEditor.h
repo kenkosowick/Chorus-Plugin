@@ -14,6 +14,8 @@
 //==============================================================================
 /**
 */
+using namespace juce;
+
 class CoolChorusAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
@@ -25,7 +27,7 @@ public:
     void resized() override;
     
     void InitializeSliders();
-    void InitializeLabels(); 
+    void InitializeLabels();
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -35,10 +37,16 @@ private:
     juce::Slider mDryWetSlider;
     juce::Slider mFeedbackSlider;
     //juce::Slider mDelayTimeSlider;
+    Slider mDepthSlider;
+    Slider mRateSlider;
+    Slider mPhaseOffsetSlider;
     
     juce::Label mDryWetLabel;
     juce::Label mFeedbackLabel;
     //juce::Label mDelayTimeLabel;
+    Label mDepthLabel;
+    Label mRateLabel;
+    Label mPhaseOffsetLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoolChorusAudioProcessorEditor)
 };
