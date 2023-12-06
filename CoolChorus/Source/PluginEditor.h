@@ -34,11 +34,11 @@ private:
     
     juce::Slider mDryWetSlider;
     juce::Slider mFeedbackSlider;
-    juce::Slider mDelayTimeSlider;
+    //juce::Slider mDelayTimeSlider;
     
     juce::Label mDryWetLabel;
     juce::Label mFeedbackLabel;
-    juce::Label mDelayTimeLabel;
+    //juce::Label mDelayTimeLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoolChorusAudioProcessorEditor)
 };

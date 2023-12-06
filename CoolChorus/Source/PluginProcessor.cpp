@@ -23,21 +23,36 @@ CoolChorusAudioProcessor::CoolChorusAudioProcessor()
 #endif
 {
     //initilization
-    addParameter(mDryWetParameter = new juce::AudioParameterFloat("drywet",
+    addParameter(mDryWetParameter = new AudioParameterFloat("drywet",
                                                              "Dry Wet",
                                                              0.0,
                                                              1.0,
                                                             0.5));
-    addParameter(mFeedbackParameter = new juce::AudioParameterFloat("feedback",
-                                                           "Feedback",
+    addParameter(mDepthParameter = new AudioParameterFloat("depth",
+                                                           "Depth",
                                                            0.0,
-                                                           0.98,
+                                                           1.0,
                                                            0.5));
-    addParameter(mDelayTimeParameter = new juce::AudioParameterFloat( "delaytime",
-                                                            "Delay Time",
-                                                            0.01,
-                                                            MAX_DELAY_TIME,
+    addParameter(mRateParameter = new AudioParameterFloat( "rate",
+                                                            "Rate",
+                                                            0.1f,
+                                                            20.f,
+                                                            10.f));
+    addParameter(mPhaseOffsetParameter = new AudioParameterFloat( "phaseoffset",
+                                                            "Phase Offset",
+                                                            0.0f,
+                                                            1.f,
+                                                            0.f));
+    addParameter(mFeedbackParameter = new AudioParameterFloat( "feedback",
+                                                            "Feedback",
+                                                            0,
+                                                            0.98,
                                                             0.5));
+    addParameter(mTypeParameter = new AudioParameterInt ("type",
+                                                         "Type",
+                                                         0,
+                                                         1,
+                                                         0));
                                     
     mCircularBufferLeft = nullptr;
     mCircularBufferRight= nullptr;
@@ -139,7 +154,7 @@ void CoolChorusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    mDelayTimeInSamples = sampleRate * *mDelayTimeParameter;
+    mDelayTimeInSamples = 1;
     
     mCircularBufferLength = sampleRate * MAX_DELAY_TIME;
     
@@ -161,7 +176,6 @@ void CoolChorusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 
     mCircularBufferWriteHead = 0;
     
-    mDelayTimeSmoothed = *mDelayTimeParameter;
 }
 
 void CoolChorusAudioProcessor::releaseResources()
@@ -231,7 +245,7 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
 
     for ( int i =0; i < buffer.getNumSamples(); i++ ) {
         
-        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.0001 * (mDelayTimeSmoothed - *mDelayTimeParameter); //Smoothing Formula
+        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.0001 * mDelayTimeSmoothed; //(mDelayTimeSmoothed - *mDelayTimeParameter); //Smoothing Formula
         mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed;
 
         mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i] + mFeedbackLeft;

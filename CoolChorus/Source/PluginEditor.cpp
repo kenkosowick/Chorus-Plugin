@@ -62,23 +62,6 @@ void CoolChorusAudioProcessorEditor::InitializeSliders()
     mFeedbackSlider.onValueChange = [this, feedbackParameter] { *feedbackParameter = mFeedbackSlider.getValue(); };
     mFeedbackSlider.onDragStart = [feedbackParameter] { feedbackParameter->beginChangeGesture(); };
     mFeedbackSlider.onDragEnd = [feedbackParameter] { feedbackParameter->endChangeGesture(); };
-    
-    //Delay Time
-    juce::AudioParameterFloat* delayTimeParameter = (juce::AudioParameterFloat*)params.getUnchecked(2);
-    
-    
-    mDelayTimeSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDelayTimeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mDelayTimeSlider.setNumDecimalPlacesToDisplay(3);
-
-    mDelayTimeSlider.setRange(delayTimeParameter->range.start, delayTimeParameter->range.end);
-    mDelayTimeSlider.setValue(*delayTimeParameter);
-    addAndMakeVisible(mDelayTimeSlider);
-    
-    //Lambda function, passing in its current state with "this"
-    mDelayTimeSlider.onValueChange = [this, delayTimeParameter] { *delayTimeParameter = mDelayTimeSlider.getValue(); };
-    mDelayTimeSlider.onDragStart = [delayTimeParameter] { delayTimeParameter->beginChangeGesture(); };
-    mDelayTimeSlider.onDragEnd = [delayTimeParameter] { delayTimeParameter->endChangeGesture(); };
 
 }
 
@@ -88,12 +71,9 @@ void CoolChorusAudioProcessorEditor::InitializeLabels()
     mDryWetLabel.setJustificationType(juce::Justification::centred);
     mFeedbackLabel.setText("Feedback", juce::NotificationType::dontSendNotification);
     mFeedbackLabel.setJustificationType(juce::Justification::centred);
-    mDelayTimeLabel.setText("Time", juce::NotificationType::dontSendNotification);
-    mDelayTimeLabel.setJustificationType(juce::Justification::centred);
     
     addAndMakeVisible(mDryWetLabel);
     addAndMakeVisible(mFeedbackLabel);
-    addAndMakeVisible(mDelayTimeLabel);
 }
 
 //==============================================================================
@@ -117,10 +97,8 @@ void CoolChorusAudioProcessorEditor::resized()
     
     mDryWetSlider.setBounds(centerX - 150, centerY - 70, 100, 100);
     mFeedbackSlider.setBounds(centerX - 50,centerY - 70,100,100);
-    mDelayTimeSlider.setBounds(centerX + 50,centerY - 70,100,100);
     
     mDryWetLabel.setBounds(centerX - 150, centerY + 40, 100, 30);
     mFeedbackLabel.setBounds(centerX - 50, centerY + 40, 100, 30);
-    mDelayTimeLabel.setBounds(centerX + 50, centerY + 40, 100, 30);
 
 }
