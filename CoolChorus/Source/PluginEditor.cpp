@@ -34,7 +34,7 @@ void CoolChorusAudioProcessorEditor::InitializeSliders()
     juce::AudioParameterFloat* dryWetParameter = (juce::AudioParameterFloat*)params.getUnchecked(0);
     
     mDryWetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDryWetSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 100, 15);
+    mDryWetSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
     mDryWetSlider.setNumDecimalPlacesToDisplay(3);
     
     mDryWetSlider.setRange(dryWetParameter->range.start, dryWetParameter->range.end);
@@ -51,7 +51,7 @@ void CoolChorusAudioProcessorEditor::InitializeSliders()
     
     
     mFeedbackSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mFeedbackSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 100, 15);
+    mFeedbackSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
     mFeedbackSlider.setNumDecimalPlacesToDisplay(3);
 
     mFeedbackSlider.setRange(feedbackParameter->range.start, feedbackParameter->range.end);
@@ -68,8 +68,8 @@ void CoolChorusAudioProcessorEditor::InitializeSliders()
     
     
     mDelayTimeSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDelayTimeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, true, 100, 15);
-    mDelayTimeSlider.setNumDecimalPlacesToDisplay(1);
+    mDelayTimeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
+    mDelayTimeSlider.setNumDecimalPlacesToDisplay(3);
 
     mDelayTimeSlider.setRange(delayTimeParameter->range.start, delayTimeParameter->range.end);
     mDelayTimeSlider.setValue(*delayTimeParameter);
@@ -112,14 +112,15 @@ void CoolChorusAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor...
+    const int centerX = getWidth()/2;
+    const int centerY = getHeight()/2;
     
+    mDryWetSlider.setBounds(centerX - 150, centerY - 70, 100, 100);
+    mFeedbackSlider.setBounds(centerX - 50,centerY - 70,100,100);
+    mDelayTimeSlider.setBounds(centerX + 50,centerY - 70,100,100);
     
-    mDryWetSlider.setBounds(0, 0, 100, 100);
-    mFeedbackSlider.setBounds(100,0,100,100);
-    mDelayTimeSlider.setBounds(200,0,100,100);
-    
-    mDryWetLabel.setBounds(0, 110, 100, 30);
-    mFeedbackLabel.setBounds(100, 110, 100, 30);
-    mDelayTimeLabel.setBounds(200, 110, 100, 30);
+    mDryWetLabel.setBounds(centerX - 150, centerY + 40, 100, 30);
+    mFeedbackLabel.setBounds(centerX - 50, centerY + 40, 100, 30);
+    mDelayTimeLabel.setBounds(centerX + 50, centerY + 40, 100, 30);
 
 }
