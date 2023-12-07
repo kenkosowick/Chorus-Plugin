@@ -41,12 +41,15 @@ private:
     Slider mRateSlider;
     Slider mPhaseOffsetSlider;
     
+    ComboBox mTypeBox;
+    
     juce::Label mDryWetLabel;
     juce::Label mFeedbackLabel;
     //juce::Label mDelayTimeLabel;
     Label mDepthLabel;
     Label mRateLabel;
     Label mPhaseOffsetLabel;
+    Label mTypeLabel; 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CoolChorusAudioProcessorEditor)
 };

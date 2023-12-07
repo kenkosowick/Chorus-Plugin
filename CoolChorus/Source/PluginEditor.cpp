@@ -100,6 +100,20 @@ void CoolChorusAudioProcessorEditor::InitializeSliders()
     mFeedbackSlider.onDragStart = [feedbackParameter] { feedbackParameter->beginChangeGesture(); };
     mFeedbackSlider.onDragEnd = [feedbackParameter] { feedbackParameter->endChangeGesture(); };
 
+    //Type Parameter
+    AudioParameterInt* typeParameter = (AudioParameterInt*)params.getUnchecked(5);
+    mTypeBox.addItem("Chorus", 1);
+    mTypeBox.addItem("Flanger", 2);
+    addAndMakeVisible(mTypeBox);
+    
+    mTypeBox.onChange = [this, typeParameter]
+    {
+        typeParameter->beginChangeGesture();
+        *typeParameter = mTypeBox.getSelectedItemIndex();
+        typeParameter->endChangeGesture();
+    };
+    
+    mTypeBox.setSelectedItemIndex(*typeParameter);
 }
 
 void CoolChorusAudioProcessorEditor::InitializeLabels()
@@ -157,5 +171,7 @@ void CoolChorusAudioProcessorEditor::resized()
     mRateLabel.setBounds(centerX - 50, centerY + 40, compWidth, 30);
     mPhaseOffsetLabel.setBounds(centerX - 50 + compWidth, centerY + 40, compWidth, 30);
     mFeedbackLabel.setBounds(centerX - 50 + compWidth*2, centerY + 40, compWidth, 30);
+    
+    mTypeBox.setBounds(centerX - 50, centerY - 110, compWidth, 20);
 
 }
