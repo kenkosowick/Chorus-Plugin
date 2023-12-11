@@ -15,9 +15,8 @@ CoolChorusAudioProcessorEditor::CoolChorusAudioProcessorEditor (CoolChorusAudioP
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (400, 300);
-    InitializeSliders();
-    InitializeLabels();
+    setSize (600, 250);
+    InitializeUIElements();
 }
 
 CoolChorusAudioProcessorEditor::~CoolChorusAudioProcessorEditor()
@@ -25,87 +24,67 @@ CoolChorusAudioProcessorEditor::~CoolChorusAudioProcessorEditor()
 }
 
 //==============================================================================
-void CoolChorusAudioProcessorEditor::InitializeSliders()
+void CoolChorusAudioProcessorEditor::InitializeUIElements()
 {
-    // Getting the parameter info by reference
+    InitializeSlider(&mDryWetSlider, 0);
+    InitializeSlider(&mDepthSlider, 1);
+    InitializeSlider(&mRateSlider, 2);
+    InitializeSlider(&mPhaseOffsetSlider, 3);
+    InitializeSlider(&mFeedbackSlider, 4);
+    
+    InitializeLabel(&mDryWetLabel, "Mix");
+    InitializeLabel(&mDepthLabel, "Depth");
+    InitializeLabel(&mRateLabel, "Rate");
+    InitializeLabel(&mPhaseOffsetLabel, "Phase Offset");
+    InitializeLabel(&mFeedbackLabel, "Feedback");
 
     auto& params = processor.getParameters();
+    //Type Parameter
+    AudioParameterInt* typeParameter = (AudioParameterInt*)params.getUnchecked(5);
+    mTypeBox.addItem("Chorus", 1);
+    mTypeBox.addItem("Flanger", 2);
+    addAndMakeVisible(mTypeBox);
     
-    juce::AudioParameterFloat* dryWetParameter = (juce::AudioParameterFloat*)params.getUnchecked(0);
+    mTypeBox.onChange = [this, typeParameter]
+    {
+        typeParameter->beginChangeGesture();
+        *typeParameter = mTypeBox.getSelectedItemIndex();
+        typeParameter->endChangeGesture();
+    };
     
-    mDryWetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDryWetSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mDryWetSlider.setNumDecimalPlacesToDisplay(3);
-    
-    mDryWetSlider.setRange(dryWetParameter->range.start, dryWetParameter->range.end);
-    mDryWetSlider.setValue(*dryWetParameter);
-    addAndMakeVisible(mDryWetSlider);
-    
-    //Lambda function, passing in its current state with "this"
-    mDryWetSlider.onValueChange = [this, dryWetParameter] { *dryWetParameter = mDryWetSlider.getValue(); };
-    mDryWetSlider.onDragStart = [dryWetParameter] { dryWetParameter->beginChangeGesture(); };
-    mDryWetSlider.onDragEnd = [dryWetParameter] { dryWetParameter->endChangeGesture(); };
-
-    //Feedback is the second paramater in the processor (1)
-    juce::AudioParameterFloat* feedbackParameter = (juce::AudioParameterFloat*)params.getUnchecked(1);
-    
-    
-    mFeedbackSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mFeedbackSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mFeedbackSlider.setNumDecimalPlacesToDisplay(3);
-
-    mFeedbackSlider.setRange(feedbackParameter->range.start, feedbackParameter->range.end);
-    mFeedbackSlider.setValue(*feedbackParameter);
-    addAndMakeVisible(mFeedbackSlider);
-    
-    //Lambda function, passing in its current state with "this"
-    mFeedbackSlider.onValueChange = [this, feedbackParameter] { *feedbackParameter = mFeedbackSlider.getValue(); };
-    mFeedbackSlider.onDragStart = [feedbackParameter] { feedbackParameter->beginChangeGesture(); };
-    mFeedbackSlider.onDragEnd = [feedbackParameter] { feedbackParameter->endChangeGesture(); };
-    
-    //Delay Time
-    juce::AudioParameterFloat* delayTimeParameter = (juce::AudioParameterFloat*)params.getUnchecked(2);
-    
-    
-    mDelayTimeSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDelayTimeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mDelayTimeSlider.setNumDecimalPlacesToDisplay(3);
-
-    mDelayTimeSlider.setRange(delayTimeParameter->range.start, delayTimeParameter->range.end);
-    mDelayTimeSlider.setValue(*delayTimeParameter);
-    addAndMakeVisible(mDelayTimeSlider);
-    
-    //Lambda function, passing in its current state with "this"
-    mDelayTimeSlider.onValueChange = [this, delayTimeParameter] { *delayTimeParameter = mDelayTimeSlider.getValue(); };
-    mDelayTimeSlider.onDragStart = [delayTimeParameter] { delayTimeParameter->beginChangeGesture(); };
-    mDelayTimeSlider.onDragEnd = [delayTimeParameter] { delayTimeParameter->endChangeGesture(); };
-
+    mTypeBox.setSelectedItemIndex(*typeParameter);
 }
 
-void CoolChorusAudioProcessorEditor::InitializeLabels()
+void CoolChorusAudioProcessorEditor::InitializeSlider(Slider* slider, int paramIndex)
 {
-    mDryWetLabel.setText("Mix", juce::NotificationType::dontSendNotification);
-    mDryWetLabel.setJustificationType(juce::Justification::centred);
-    mFeedbackLabel.setText("Feedback", juce::NotificationType::dontSendNotification);
-    mFeedbackLabel.setJustificationType(juce::Justification::centred);
-    mDelayTimeLabel.setText("Time", juce::NotificationType::dontSendNotification);
-    mDelayTimeLabel.setJustificationType(juce::Justification::centred);
+    auto& params = processor.getParameters();
+    jassert(paramIndex >= 0 && paramIndex < params.size());
+    AudioParameterFloat* parameter = (AudioParameterFloat*)params.getUnchecked(paramIndex);
     
-    addAndMakeVisible(mDryWetLabel);
-    addAndMakeVisible(mFeedbackLabel);
-    addAndMakeVisible(mDelayTimeLabel);
+    jassert(slider != nullptr);
+    slider->setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+    slider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
+    slider->setNumDecimalPlacesToDisplay(3);
+    
+    slider->setRange(parameter->range.start, parameter->range.end);
+    slider->setValue(*parameter);
+    addAndMakeVisible(slider);
+    slider->onValueChange = [this, parameter, slider] { *parameter = slider->getValue(); };
+    slider->onDragStart = [parameter] { parameter->beginChangeGesture(); };
+    slider->onDragEnd = [parameter] { parameter->endChangeGesture(); };
+}
+
+void CoolChorusAudioProcessorEditor::InitializeLabel(Label* label, const String& labelText)
+{
+    label->setText(labelText, NotificationType::dontSendNotification);
+    label->setJustificationType(Justification::centred);
+    addAndMakeVisible(label);
 }
 
 //==============================================================================
 void CoolChorusAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-    /*
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
-     */
 }
 
 void CoolChorusAudioProcessorEditor::resized()
@@ -114,13 +93,20 @@ void CoolChorusAudioProcessorEditor::resized()
     // subcomponents in your editor...
     const int centerX = getWidth()/2;
     const int centerY = getHeight()/2;
+    const int compWidth = 100;
     
-    mDryWetSlider.setBounds(centerX - 150, centerY - 70, 100, 100);
-    mFeedbackSlider.setBounds(centerX - 50,centerY - 70,100,100);
-    mDelayTimeSlider.setBounds(centerX + 50,centerY - 70,100,100);
+    mDryWetSlider.setBounds(centerX - 50 - compWidth*2, centerY - 70, compWidth, 100);
+    mDepthSlider.setBounds(centerX - 50 - compWidth, centerY - 70,compWidth,100);
+    mRateSlider.setBounds(centerX - 50, centerY - 70, compWidth, 100);
+    mPhaseOffsetSlider.setBounds(centerX - 50 + compWidth,centerY - 70,compWidth,100);
+    mFeedbackSlider.setBounds(centerX - 50 + compWidth*2,centerY - 70,compWidth,100);
     
-    mDryWetLabel.setBounds(centerX - 150, centerY + 40, 100, 30);
-    mFeedbackLabel.setBounds(centerX - 50, centerY + 40, 100, 30);
-    mDelayTimeLabel.setBounds(centerX + 50, centerY + 40, 100, 30);
+    mDryWetLabel.setBounds(centerX - 50 - compWidth*2, centerY + 40, compWidth, 30);
+    mDepthLabel.setBounds(centerX - 50 - compWidth, centerY + 40, compWidth, 30);
+    mRateLabel.setBounds(centerX - 50, centerY + 40, compWidth, 30);
+    mPhaseOffsetLabel.setBounds(centerX - 50 + compWidth, centerY + 40, compWidth, 30);
+    mFeedbackLabel.setBounds(centerX - 50 + compWidth*2, centerY + 40, compWidth, 30);
+    
+    mTypeBox.setBounds(centerX - 50, centerY - 110, compWidth, 20);
 
 }

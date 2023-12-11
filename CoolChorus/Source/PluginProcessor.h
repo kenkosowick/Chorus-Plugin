@@ -15,6 +15,8 @@
 //==============================================================================
 /**
 */
+using namespace juce;
+
 class CoolChorusAudioProcessor  : public juce::AudioProcessor
                             #if JucePlugin_Enable_ARA
                              , public juce::AudioProcessorARAExtension
@@ -64,17 +66,26 @@ private:
     //==============================================================================
     
     float mDelayTimeSmoothed;
+    float mLFOPhase;
     
-    juce::AudioParameterFloat* mDryWetParameter;
-    juce::AudioParameterFloat* mFeedbackParameter;
-    juce::AudioParameterFloat* mDelayTimeParameter;
+    AudioParameterFloat* mDryWetParameter;
+    AudioParameterFloat* mFeedbackParameter;
+    //juce::AudioParameterFloat* mDelayTimeParameter; This will be modulated by our LFO
+    AudioParameterFloat* mDepthParameter;
+    AudioParameterFloat* mRateParameter;
+    AudioParameterFloat* mPhaseOffsetParameter;
+    
+    AudioParameterInt* mTypeParameter;
     
     float* mCircularBufferLeft;
     float* mCircularBufferRight;
+    
     int mCircularBufferWriteHead;
     int mCircularBufferLength;
+    
     float mDelayTimeInSamples;
     float mDelayReadHead;
+    
     float mFeedbackLeft;
     float mFeedbackRight;
     
