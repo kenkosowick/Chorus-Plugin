@@ -81,40 +81,10 @@ void CoolChorusAudioProcessorEditor::InitializeLabel(Label* label, const String&
     addAndMakeVisible(label);
 }
 
-void CoolChorusAudioProcessorEditor::InitializeLabels()
-{
-    mDryWetLabel.setText("Mix", juce::NotificationType::dontSendNotification);
-    mDryWetLabel.setJustificationType(juce::Justification::centred);
-    
-    mDepthLabel.setText("Depth", juce::NotificationType::dontSendNotification);
-    mDepthLabel.setJustificationType(juce::Justification::centred);
-    
-    mRateLabel.setText("Rate", juce::NotificationType::dontSendNotification);
-    mRateLabel.setJustificationType(juce::Justification::centred);
-    
-    mPhaseOffsetLabel.setText("Phase Offset", juce::NotificationType::dontSendNotification);
-    mPhaseOffsetLabel.setJustificationType(juce::Justification::centred);
-    
-    mFeedbackLabel.setText("Feedback", juce::NotificationType::dontSendNotification);
-    mFeedbackLabel.setJustificationType(juce::Justification::centred);
-    
-    addAndMakeVisible(mDryWetLabel);
-    addAndMakeVisible(mDepthLabel);
-    addAndMakeVisible(mRateLabel);
-    addAndMakeVisible(mPhaseOffsetLabel);
-    addAndMakeVisible(mFeedbackLabel);
-}
-
 //==============================================================================
 void CoolChorusAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-    /*
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
-     */
 }
 
 void CoolChorusAudioProcessorEditor::resized()
