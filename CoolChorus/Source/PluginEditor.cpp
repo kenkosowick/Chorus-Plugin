@@ -16,8 +16,7 @@ CoolChorusAudioProcessorEditor::CoolChorusAudioProcessorEditor (CoolChorusAudioP
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (600, 250);
-    InitializeSliders();
-    InitializeLabels();
+    InitializeUIElements();
 }
 
 CoolChorusAudioProcessorEditor::~CoolChorusAudioProcessorEditor()
@@ -25,81 +24,21 @@ CoolChorusAudioProcessorEditor::~CoolChorusAudioProcessorEditor()
 }
 
 //==============================================================================
-void CoolChorusAudioProcessorEditor::InitializeSliders()
+void CoolChorusAudioProcessorEditor::InitializeUIElements()
 {
+    InitializeSlider(&mDryWetSlider, 0);
+    InitializeSlider(&mDepthSlider, 1);
+    InitializeSlider(&mRateSlider, 2);
+    InitializeSlider(&mPhaseOffsetSlider, 3);
+    InitializeSlider(&mFeedbackSlider, 4);
+    
+    InitializeLabel(&mDryWetLabel, "Mix");
+    InitializeLabel(&mDepthLabel, "Depth");
+    InitializeLabel(&mRateLabel, "Rate");
+    InitializeLabel(&mPhaseOffsetLabel, "Phase Offset");
+    InitializeLabel(&mFeedbackLabel, "Feedback");
 
     auto& params = processor.getParameters();
-    
-    // Dry Wet parameter
-    juce::AudioParameterFloat* dryWetParameter = (juce::AudioParameterFloat*)params.getUnchecked(0);
-    mDryWetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDryWetSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mDryWetSlider.setNumDecimalPlacesToDisplay(3);
-    
-    mDryWetSlider.setRange(dryWetParameter->range.start, dryWetParameter->range.end);
-    mDryWetSlider.setValue(*dryWetParameter);
-    addAndMakeVisible(mDryWetSlider);
-    mDryWetSlider.onValueChange = [this, dryWetParameter] { *dryWetParameter = mDryWetSlider.getValue(); };
-    mDryWetSlider.onDragStart = [dryWetParameter] { dryWetParameter->beginChangeGesture(); };
-    mDryWetSlider.onDragEnd = [dryWetParameter] { dryWetParameter->endChangeGesture(); };
-    
-    
-    // Depth Parameter
-    juce::AudioParameterFloat* depthParameter = (juce::AudioParameterFloat*)params.getUnchecked(1);
-    mDepthSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mDepthSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mDepthSlider.setNumDecimalPlacesToDisplay(3);
-    
-    mDepthSlider.setRange(depthParameter->range.start, depthParameter->range.end);
-    mDepthSlider.setValue(*depthParameter);
-    addAndMakeVisible(mDepthSlider);
-    mDepthSlider.onValueChange = [this, depthParameter] { *depthParameter = mDepthSlider.getValue(); };
-    mDepthSlider.onDragStart = [depthParameter] { depthParameter->beginChangeGesture(); };
-    mDepthSlider.onDragEnd = [depthParameter] { depthParameter->endChangeGesture(); };
-    
-    
-    // Rate Parameter
-    juce::AudioParameterFloat* rateParameter = (juce::AudioParameterFloat*)params.getUnchecked(2);
-    mRateSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mRateSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mRateSlider.setNumDecimalPlacesToDisplay(3);
-    
-    mRateSlider.setRange(rateParameter->range.start, rateParameter->range.end);
-    mRateSlider.setValue(*rateParameter);
-    addAndMakeVisible(mRateSlider);
-    mRateSlider.onValueChange = [this, rateParameter] { *rateParameter = mRateSlider.getValue(); };
-    mRateSlider.onDragStart = [rateParameter] { rateParameter->beginChangeGesture(); };
-    mRateSlider.onDragEnd = [rateParameter] { rateParameter->endChangeGesture(); };
-    
-    
-    // Phase Offset Parameter
-    juce::AudioParameterFloat* phaseOffsetParameter = (juce::AudioParameterFloat*)params.getUnchecked(3);
-    mPhaseOffsetSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mPhaseOffsetSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mPhaseOffsetSlider.setNumDecimalPlacesToDisplay(3);
-    
-    mPhaseOffsetSlider.setRange(phaseOffsetParameter->range.start, phaseOffsetParameter->range.end);
-    mPhaseOffsetSlider.setValue(*phaseOffsetParameter);
-    addAndMakeVisible(mPhaseOffsetSlider);
-    mPhaseOffsetSlider.onValueChange = [this, phaseOffsetParameter] { *phaseOffsetParameter = mPhaseOffsetSlider.getValue(); };
-    mPhaseOffsetSlider.onDragStart = [phaseOffsetParameter] { phaseOffsetParameter->beginChangeGesture(); };
-    mPhaseOffsetSlider.onDragEnd = [phaseOffsetParameter] { phaseOffsetParameter->endChangeGesture(); };
-    
-    
-    //Feedback parameter
-    //Feedback is the second paramater in the processor (4)
-    juce::AudioParameterFloat* feedbackParameter = (juce::AudioParameterFloat*)params.getUnchecked(4);
-    mFeedbackSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    mFeedbackSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
-    mFeedbackSlider.setNumDecimalPlacesToDisplay(3);
-
-    mFeedbackSlider.setRange(feedbackParameter->range.start, feedbackParameter->range.end);
-    mFeedbackSlider.setValue(*feedbackParameter);
-    addAndMakeVisible(mFeedbackSlider);
-    mFeedbackSlider.onValueChange = [this, feedbackParameter] { *feedbackParameter = mFeedbackSlider.getValue(); };
-    mFeedbackSlider.onDragStart = [feedbackParameter] { feedbackParameter->beginChangeGesture(); };
-    mFeedbackSlider.onDragEnd = [feedbackParameter] { feedbackParameter->endChangeGesture(); };
-
     //Type Parameter
     AudioParameterInt* typeParameter = (AudioParameterInt*)params.getUnchecked(5);
     mTypeBox.addItem("Chorus", 1);
@@ -114,6 +53,32 @@ void CoolChorusAudioProcessorEditor::InitializeSliders()
     };
     
     mTypeBox.setSelectedItemIndex(*typeParameter);
+}
+
+void CoolChorusAudioProcessorEditor::InitializeSlider(Slider* slider, int paramIndex)
+{
+    auto& params = processor.getParameters();
+    jassert(paramIndex >= 0 && paramIndex < params.size());
+    AudioParameterFloat* parameter = (AudioParameterFloat*)params.getUnchecked(paramIndex);
+    
+    jassert(slider != nullptr);
+    slider->setSliderStyle(Slider::SliderStyle::RotaryVerticalDrag);
+    slider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 100, 15);
+    slider->setNumDecimalPlacesToDisplay(3);
+    
+    slider->setRange(parameter->range.start, parameter->range.end);
+    slider->setValue(*parameter);
+    addAndMakeVisible(slider);
+    slider->onValueChange = [this, parameter, slider] { *parameter = slider->getValue(); };
+    slider->onDragStart = [parameter] { parameter->beginChangeGesture(); };
+    slider->onDragEnd = [parameter] { parameter->endChangeGesture(); };
+}
+
+void CoolChorusAudioProcessorEditor::InitializeLabel(Label* label, const String& labelText)
+{
+    label->setText(labelText, NotificationType::dontSendNotification);
+    label->setJustificationType(Justification::centred);
+    addAndMakeVisible(label);
 }
 
 void CoolChorusAudioProcessorEditor::InitializeLabels()

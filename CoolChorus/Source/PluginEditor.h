@@ -26,8 +26,9 @@ public:
     void paint (juce::Graphics&) override;
     void resized() override;
     
-    void InitializeSliders();
-    void InitializeLabels();
+    void InitializeUIElements();
+    void InitializeSlider(Slider* slider, int parameterIndex);
+    void InitializeLabel(Label* label, const String& labelText);
 
 private:
     // This reference is provided as a quick way for your editor to

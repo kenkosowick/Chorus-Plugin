@@ -237,9 +237,10 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             mLFOPhase -= 1;
         }
         
-       // float lfoOutMapped = jmap( lfoOut, -1, 1, 0.005f, 0.03f);
-        float lfoOutMapped = jmap(lfoOut, -1.f, 1.f, 0.005f, 0.03f);
+        
         lfoOut *= *mDepthParameter;
+        float lfoOutMapped = jmap(lfoOut, -1.f, 1.f, 0.005f, 0.03f);
+        
         
         mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - lfoOutMapped); //smoothing 0.0001 helps when lfo is using a saw tooth or other types of waveforms to prevents clicks.
         //(mDelayTimeSmoothed - *mDelayTimeParameter); //Smoothing Formula
