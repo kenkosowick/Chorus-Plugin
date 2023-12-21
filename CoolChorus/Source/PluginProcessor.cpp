@@ -234,7 +234,7 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         //LFO calculations for Delay time-------------------------------------------------------------------
         float lfoOutLeft = sin(2*M_PI * mLFOPhase);
         lfoOutLeft *= *mDepthParameter;
-        float lfoOutMappedLeft = jmap(lfoOutLeft, -1.f, 1.f, 0.005f, 0.03f);
+        
         
         float lfoPhaseRight = mLFOPhase + *mPhaseOffsetParameter;
         if (lfoPhaseRight > 1)
@@ -244,8 +244,22 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         
         float lfoOutRight = sin(2*M_PI * lfoPhaseRight);
         lfoOutRight *= *mDepthParameter;
-        float lfoOutMappedRight = jmap(lfoOutRight, -1.f, 1.f, 0.005f, 0.03f);
         
+        // Determine whether type is chorus or flanger
+        float lfoOutMappedLeft = 0;
+        float lfoOutMappedRight = 0;
+        
+        if (*mTypeParameter == 1) //Flanger
+        {
+            lfoOutMappedLeft = jmap(lfoOutLeft, -1.f, 1.f, 0.001f, 0.005f); // Delay time range
+            lfoOutMappedRight = jmap(lfoOutRight, -1.f, 1.f, 0.001f, 0.005f);
+        }
+        else // Chorus
+        {
+            lfoOutMappedLeft = jmap(lfoOutLeft, -1.f, 1.f, 0.005f, 0.03f);
+            lfoOutMappedRight = jmap(lfoOutRight, -1.f, 1.f, 0.005f, 0.03f);
+        }
+
         
         mLFOPhase += *mRateParameter / getSampleRate(); //frequency/sr
         
