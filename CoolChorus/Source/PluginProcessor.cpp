@@ -227,9 +227,26 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
     float* leftChannel = buffer.getWritePointer(0);
     float* rightChannel = buffer.getWritePointer(1);
 
-    for ( int i =0; i < buffer.getNumSamples(); i++ ) {
+
+    // Main samples loop
+    for ( int i =0; i < buffer.getNumSamples(); i++ )
+    {
+        //LFO calculations for Delay time-------------------------------------------------------------------
+        float lfoOutLeft = sin(2*M_PI * mLFOPhase);
+        lfoOutLeft *= *mDepthParameter;
+        float lfoOutMappedLeft = jmap(lfoOutLeft, -1.f, 1.f, 0.005f, 0.03f);
         
-        float lfoOut = sin(2*M_PI * mLFOPhase);
+        float lfoPhaseRight = mLFOPhase + *mPhaseOffsetParameter;
+        if (lfoPhaseRight > 1)
+        {
+            lfoPhaseRight -= 1;
+        }
+        
+        float lfoOutRight = sin(2*M_PI * lfoPhaseRight);
+        lfoOutRight *= *mDepthParameter;
+        float lfoOutMappedRight = jmap(lfoOutRight, -1.f, 1.f, 0.005f, 0.03f);
+        
+        
         mLFOPhase += *mRateParameter / getSampleRate(); //frequency/sr
         
         if (mLFOPhase > 1)
@@ -238,36 +255,45 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
         }
         
         
-        lfoOut *= *mDepthParameter;
-        float lfoOutMapped = jmap(lfoOut, -1.f, 1.f, 0.005f, 0.03f);
-        
-        
-        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - lfoOutMapped); //smoothing helps when lfo is using a saw tooth or other types of waveforms to prevents clicks. (Previously 0.0001)
+        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - lfoOutMappedLeft); //smoothing helps when lfo is using a saw tooth or other types of waveforms to prevents clicks. (Previously 0.0001)
         
         //(mDelayTimeSmoothed - *mDelayTimeParameter); //Smoothing Formula
         
-        mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed;
-
+        mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed; //left
+        float delayTimeSamplesRight = getSampleRate() * lfoOutMappedRight; //right
+        //-------------------------------------------------------------------------------------
+        
         mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i] + mFeedbackLeft;
         mCircularBufferRight[mCircularBufferWriteHead]= rightChannel[i] + mFeedbackRight;
         
-        //Setting delay readhead
+        //Setting delay readhead----------------------------------------------------------------
         mDelayReadHead = mCircularBufferWriteHead - mDelayTimeInSamples;
-        if ( mDelayReadHead < 0 ) {
+        float delayReadHeadRight = mCircularBufferWriteHead - delayTimeSamplesRight;
+        
+        if ( mDelayReadHead < 0 )
+        {
             mDelayReadHead += mCircularBufferLength;
         }
         
-        int readHead_x = (int)mDelayReadHead;
-        int readHead_x1 = readHead_x + 1;
-        if ( readHead_x1 >= mCircularBufferLength) { //checking to see if readHead is wrapping around
-            readHead_x1 -= mCircularBufferLength;
+        int readHead_L = (int)mDelayReadHead;
+        int readHead_L1 = readHead_L + 1; // The sample one index ahead of the read head
+        int readHead_R = (int)delayReadHeadRight;
+        int readHead_R1 = readHead_R + 1;
+        
+        //checking to see if readHead_x1 is wrapping around
+        if ( readHead_L1 >= mCircularBufferLength)
+        {
+            readHead_L1 -= mCircularBufferLength;
         }
-        float readHeadFloat = mDelayReadHead - readHead_x; //the difference between the two readheads
+        if ( readHead_R1 >= mCircularBufferLength)
+        {
+            readHead_R1 -= mCircularBufferLength;
+        }
+        float readHeadFloatL = mDelayReadHead - readHead_L; //the difference between the two readheads
+        float readHeadFloatR = delayReadHeadRight - readHead_R;
         
-        
-        
-        float delay_sample_left = myfunc::lin_interp(mCircularBufferLeft[readHead_x], mCircularBufferLeft[readHead_x1], readHeadFloat);
-        float delay_sample_right = myfunc::lin_interp(mCircularBufferRight[readHead_x], mCircularBufferRight[readHead_x1], readHeadFloat);
+        float delay_sample_left = myfunc::lin_interp(mCircularBufferLeft[readHead_L], mCircularBufferLeft[readHead_L1], readHeadFloatL);
+        float delay_sample_right = myfunc::lin_interp(mCircularBufferRight[readHead_R], mCircularBufferRight[readHead_R1], readHeadFloatR);
         
         mFeedbackLeft = delay_sample_left * *mFeedbackParameter;
         mFeedbackRight = delay_sample_right * *mFeedbackParameter;
