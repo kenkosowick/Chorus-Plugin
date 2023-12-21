@@ -259,34 +259,41 @@ void CoolChorusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, j
             lfoOutMappedLeft = jmap(lfoOutLeft, -1.f, 1.f, 0.005f, 0.03f);
             lfoOutMappedRight = jmap(lfoOutRight, -1.f, 1.f, 0.005f, 0.03f);
         }
-
+        
         
         mLFOPhase += *mRateParameter / getSampleRate(); //frequency/sr
+        
+        float delayTimeSamplesLeft = getSampleRate() * lfoOutMappedLeft;
+        float delayTimeSamplesRight = getSampleRate() * lfoOutMappedRight; //right
         
         if (mLFOPhase > 1)
         {
             mLFOPhase -= 1;
         }
         
-        
-        mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - lfoOutMappedLeft); //smoothing helps when lfo is using a saw tooth or other types of waveforms to prevents clicks. (Previously 0.0001)
+        // Smoothing
+        //mDelayTimeSmoothed = mDelayTimeSmoothed - 0.001 * (mDelayTimeSmoothed - lfoOutMappedLeft); //smoothing helps when lfo is using a saw tooth or other types of waveforms to prevents clicks. (Previously 0.0001)
         
         //(mDelayTimeSmoothed - *mDelayTimeParameter); //Smoothing Formula
         
-        mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed; //left
-        float delayTimeSamplesRight = getSampleRate() * lfoOutMappedRight; //right
+        //mDelayTimeInSamples = getSampleRate() * mDelayTimeSmoothed; //left
+        
         //-------------------------------------------------------------------------------------
         
         mCircularBufferLeft[mCircularBufferWriteHead] = leftChannel[i] + mFeedbackLeft;
         mCircularBufferRight[mCircularBufferWriteHead]= rightChannel[i] + mFeedbackRight;
         
         //Setting delay readhead----------------------------------------------------------------
-        mDelayReadHead = mCircularBufferWriteHead - mDelayTimeInSamples;
+        mDelayReadHead = mCircularBufferWriteHead - delayTimeSamplesLeft; //mDelayTimeInSamples;
         float delayReadHeadRight = mCircularBufferWriteHead - delayTimeSamplesRight;
         
         if ( mDelayReadHead < 0 )
         {
             mDelayReadHead += mCircularBufferLength;
+        }
+        if (delayReadHeadRight < 0)
+        {
+            delayReadHeadRight += mCircularBufferLength;
         }
         
         int readHead_L = (int)mDelayReadHead;
